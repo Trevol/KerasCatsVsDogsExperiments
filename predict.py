@@ -10,8 +10,8 @@ def imageToBatch(imagePath):
     return x.reshape((1,) + x.shape)  # this is a Numpy array with shape (1, 3, 150, 150)
 
 
-cat = imageToBatch('data/train/cats/cat.0.jpg')
-dog = imageToBatch('data/train/dogs/dog.0.jpg')
+cat = imageToBatch('data/train/cats/cat.10.jpg')
+dog = imageToBatch('data/train/dogs/dog.10.jpg')
 
 print('no weights. cat. predict', model.predict(cat))
 print('no weights. cat. predict_classes', model.predict_classes(cat))

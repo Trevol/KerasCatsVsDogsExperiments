@@ -83,6 +83,8 @@ if __name__ == '__main__':
                       optimizer='rmsprop',
                       metrics=['accuracy'])
 
+        model.load_weights('first_try_.h5')
+
         # this is the augmentation configuration we will use for training
         train_datagen = ImageDataGenerator(
             rescale=1. / 255,
