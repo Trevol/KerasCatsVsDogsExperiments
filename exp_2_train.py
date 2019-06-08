@@ -114,3 +114,5 @@ if __name__ == '__main__':
             validation_steps=nb_validation_samples // batch_size)
 
         model.save_weights('first_try.h5')
+
+    train()
