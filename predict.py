@@ -11,8 +11,8 @@ def imageToBatch(imagePath, targetSize):
 
 inputSize = (150, 150)
 model = makeModel(inputSize)
-cat = imageToBatch('data/train/cats/cat.10.jpg', inputSize)
-dog = imageToBatch('data/train/dogs/dog.10.jpg', inputSize)
+cat = imageToBatch('all_data/validation/cats/cat.10000.jpg', inputSize)
+dog = imageToBatch('all_data/validation/dogs/dog.10000.jpg', inputSize)
 
 print('no weights. cat. predict', model.predict(cat))
 print('no weights. cat. predict_classes', model.predict_classes(cat))
