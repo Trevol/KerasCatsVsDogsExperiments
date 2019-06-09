@@ -48,7 +48,7 @@ def train():
     validation_data_dir = 'all_data/validation'
 
     epochs = 50
-    batch_size = 16
+    batch_size = 64
 
     # this is the augmentation configuration we will use for training
     train_datagen = ImageDataGenerator(
@@ -83,7 +83,7 @@ def train():
         validation_data=validation_generator,
         validation_steps=nb_validation_samples // batch_size)
 
-    model.save_weights('first_try.h5')
+    model.save_weights('first_try_all.h5')
 
 
 if __name__ == '__main__':

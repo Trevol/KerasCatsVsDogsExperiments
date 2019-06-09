@@ -48,7 +48,7 @@ def train():
     validation_data_dir = 'data/validation'
 
     epochs = 50
-    batch_size = 16
+    batch_size = 64
 
     # this is the augmentation configuration we will use for training
     train_datagen = ImageDataGenerator(
