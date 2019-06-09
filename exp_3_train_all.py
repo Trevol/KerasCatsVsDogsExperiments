@@ -44,8 +44,8 @@ def train():
     inputSize = (150, 150)
     model = makeModel(inputSize, compileForTraining=True, weights='first_try.h5')
 
-    train_data_dir = 'data/train'
-    validation_data_dir = 'data/validation'
+    train_data_dir = 'all_data/train'
+    validation_data_dir = 'all_data/validation'
 
     epochs = 50
     batch_size = 16
