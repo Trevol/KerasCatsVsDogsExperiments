@@ -2,16 +2,17 @@ from keras.preprocessing.image import ImageDataGenerator
 import os
 
 
-def makeDataset(datasetPath, inputSize, batchSize):
+def makeDataset(datasetPath, inputSize, batchSize, train_augmentations=None):
     train_data_dir = os.path.join(datasetPath, 'train')
     validation_data_dir = os.path.join(datasetPath, 'validation')
 
     # this is the augmentation configuration we will use for training
-    train_datagen = ImageDataGenerator(
-        rescale=1. / 255,
-        shear_range=0.2,
-        zoom_range=0.2,
-        horizontal_flip=True)
+    if train_augmentations is None:
+        train_augmentations = dict(rescale=1. / 255,
+                                  shear_range=0.2,
+                                  zoom_range=0.2,
+                                  horizontal_flip=True)
+    train_datagen = ImageDataGenerator(**train_augmentations)
 
     # this is the augmentation configuration we will use for testing:
     # only rescaling
