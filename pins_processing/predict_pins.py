@@ -40,19 +40,36 @@ def video_frames(targetSize, startFrom=None):
     cap.release()
 
 
+def error_frames_video_2():
+    f = [
+        809,
+        1197,  # 1199
+        1202,
+        1557,  # 1558
+        1560,  # 1565
+        1614,
+    ]
+
+
 def main():
     classIndices = {'in_process': 0, 'stable': 1}
     indexClasses = {0: 'in_process', 1: 'stable'}
-    size = (256, 256)
-    model = makeModel(size, weights='50_0.1931_0.9345_2.7987_0.8333.h5')
+    colors = {0: (0, 0, 255), 1: (0, 220, 0)}
 
-    for pos, bgrImg, batch in video_frames(size, startFrom=600):
+    size = (256, 256)
+
+    # weights = '11_0.1113_0.9576_1.0759_0.9231.h5'    # 809-0.81523  810-0.99917 811-0.10084
+    weights = '03_0.1970_0.9487_0.3971_0.8462.h5'    #   809-0.99674  810-0.99912 811-0.98278
+    model = makeModel(size, weights=weights)
+
+    for pos, bgrImg, batch in video_frames(size, startFrom=1557):
         class_ = model.predict_classes(batch)[0, 0]
         proba = model.predict(batch)[0, 0]
 
-        cv2.putText(bgrImg, f'{pos}', (15, 20), cv2.FONT_HERSHEY_COMPLEX, 1, (0, 0, 255))
+        color = colors[class_]
+        cv2.putText(bgrImg, f'{pos}', (15, 22), cv2.FONT_HERSHEY_COMPLEX, 1, color)
         info = f'{class_} {indexClasses[class_]}  {proba:.5f}'
-        cv2.putText(bgrImg, info, (15, 50), cv2.FONT_HERSHEY_COMPLEX, 1, (0, 0, 255))
+        cv2.putText(bgrImg, info, (15, 52), cv2.FONT_HERSHEY_COMPLEX, 1, color)
 
         cv2.imshow('Image', bgrImg)
         if cv2.waitKey() in (-1, 27):
@@ -60,24 +77,3 @@ def main():
 
 
 main()
-
-# def imageToBatch(imagePath, targetSize):
-#     img = load_img(imagePath, target_size=None)  # this is a PIL image
-#     img = img.resize(targetSize, Image.NEAREST)
-#     x = img_to_array(img)  # this is a Numpy array
-#     x = x / 255.  # rescale to [0, 1]
-#     return x, x.reshape((1,) + x.shape)  # this is a Numpy array with shape (1, *targetSize, 3)
-# cat = imageToBatch('all_data/validation/cats/cat.10000.jpg', inputSize)
-# dog = imageToBatch('all_data/validation/dogs/dog.10000.jpg', inputSize)
-#
-# print('no weights. cat. predict', model.predict(cat))
-# print('no weights. cat. predict_classes', model.predict_classes(cat))
-# print('no weights. dog. predict', model.predict(dog))
-# print('no weights. dog. predict_classes', model.predict_classes(dog))
-#
-# model.load_weights('first_try.h5')
-#
-# print('With weights. cat. predict', model.predict(cat))
-# print('With weights. cat. predict_classes', model.predict_classes(cat))
-# print('With weights. dog. predict', model.predict(dog))
-# print('With weights. dog. predict_classes', model.predict_classes(dog))

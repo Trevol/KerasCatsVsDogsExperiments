@@ -3,7 +3,6 @@ from dataset import makeDataset
 import keras
 import os
 
-
 def train():
     inputSize = (256, 256)
     startWithWeights = '/mnt/HDD/training_checkpoints/KerasCatsVsDogsExperiments/pins_processing/2/01_0.4317_0.9219_0.2505_0.8462.h5'
