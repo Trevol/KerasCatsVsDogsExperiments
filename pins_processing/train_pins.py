@@ -23,9 +23,11 @@ def train():
     nb_train_samples = train_generator.samples
     nb_validation_samples = validation_generator.samples
 
-    os.makedirs('/mnt/HDD/training_checkpoints/KerasCatsVsDogsExperiments/pins_processing', exist_ok=True)
+    checkpointDir = '/mnt/HDD/training_checkpoints/KerasCatsVsDogsExperiments/pins_processing'
+    os.makedirs(checkpointDir, exist_ok=True)
+
     checkpoint = keras.callbacks.ModelCheckpoint(
-        '/mnt/HDD/training_checkpoints/KerasCatsVsDogsExperiments/pins_processing/{epoch:02d}.h5',
+        os.path.join(checkpointDir, '{epoch:02d}_{loss:.4f}_{acc:.4f}_{val_loss:.4f}_{val_acc:.4f}.h5'),
         verbose=1,
         # save_best_only=True,
         # monitor="mAP",
