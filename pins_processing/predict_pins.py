@@ -25,9 +25,7 @@ def static_files(targetSize):
         yield bgr, batch
 
 
-def video_frames(targetSize, startFrom=None):
-    path = r'D:\DiskE\Computer_Vision_Task\video_2.mp4'
-    cap = cv2.VideoCapture(path)
+def video_frames(cap, targetSize, startFrom=None):
     if startFrom:
         cap.set(cv2.CAP_PROP_POS_FRAMES, startFrom)
     while True:
@@ -51,6 +49,15 @@ def error_frames_video_2():
     ]
 
 
+def videoWriter(videoCapture: cv2.VideoCapture, videoPath):
+    cc = cv2.VideoWriter_fourcc(*'MP4V')  # 'XVID' ('M', 'J', 'P', 'G')
+    # videoOut = cv2.VideoWriter('/mnt/HDD/Rec_15_720_out_76.mp4', fourcc, videoIn.fps(), videoIn.resolution())
+    w = int(videoCapture.get(cv2.CAP_PROP_FRAME_WIDTH))
+    h = int(videoCapture.get(cv2.CAP_PROP_FRAME_HEIGHT))
+    size = (w, h)
+    return cv2.VideoWriter(videoPath, cc, videoCapture.get(cv2.CAP_PROP_FPS), size)
+
+
 def main():
     classIndices = {'in_process': 0, 'stable': 1}
     indexClasses = {0: 'in_process', 1: 'stable'}
@@ -59,10 +66,14 @@ def main():
     size = (256, 256)
 
     # weights = '11_0.1113_0.9576_1.0759_0.9231.h5'    # 809-0.81523  810-0.99917 811-0.10084
-    weights = '03_0.1970_0.9487_0.3971_0.8462.h5'    #   809-0.99674  810-0.99912 811-0.98278
+    # weights = '03_0.1970_0.9487_0.3971_0.8462.h5'    #   809-0.99674  810-0.99912 811-0.98278
+    weights = '17_0.0895_0.9823_0.7979_0.9500.h5'
     model = makeModel(size, weights=weights)
 
-    for pos, bgrImg, batch in video_frames(size, startFrom=1557):
+    cap = cv2.VideoCapture(r'D:\DiskE\Computer_Vision_Task\video_2.mp4')
+    writer = videoWriter(cap, 'video_2_classified.mp4')
+
+    for pos, bgrImg, batch in video_frames(cap, size, startFrom=0):
         class_ = model.predict_classes(batch)[0, 0]
         proba = model.predict(batch)[0, 0]
 
@@ -71,9 +82,14 @@ def main():
         info = f'{class_} {indexClasses[class_]}  {proba:.5f}'
         cv2.putText(bgrImg, info, (15, 52), cv2.FONT_HERSHEY_COMPLEX, 1, color)
 
+        if writer: writer.write(bgrImg)
         cv2.imshow('Image', bgrImg)
-        if cv2.waitKey() in (-1, 27):
+
+        if cv2.waitKey(1) in (27, ):
             break
+
+    cap.release()
+    if writer: writer.release()
 
 
 main()
