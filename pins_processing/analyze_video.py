@@ -48,7 +48,7 @@ L_ARROW = 2424832
 # 402 (req: in_process), [1556-1565] (req: in_process), 1614 (req: in_process)
 # 2547 - in_proc
 def main():
-    path = 'videos/video_2_classified_w49.mp4'
+    path = 'videos/video_6_classified_4_17.mp4'
     with VideoPlayback(path) as video:
         video.setPos(0)
         for pos, frame in video.frames():

@@ -50,7 +50,7 @@ def error_frames_video_2():
 
 
 def videoWriter(videoCapture: cv2.VideoCapture, videoPath):
-    cc = cv2.VideoWriter_fourcc(*'MP4V')  # 'XVID' ('M', 'J', 'P', 'G')
+    cc = cv2.VideoWriter_fourcc(*'XVID')  # 'XVID' ('M', 'J', 'P', 'G')
     # videoOut = cv2.VideoWriter('/mnt/HDD/Rec_15_720_out_76.mp4', fourcc, videoIn.fps(), videoIn.resolution())
     w = int(videoCapture.get(cv2.CAP_PROP_FRAME_WIDTH))
     h = int(videoCapture.get(cv2.CAP_PROP_FRAME_HEIGHT))
@@ -58,24 +58,16 @@ def videoWriter(videoCapture: cv2.VideoCapture, videoPath):
     return cv2.VideoWriter(videoPath, cc, videoCapture.get(cv2.CAP_PROP_FPS), size)
 
 
-def main():
+def classifyVideo(model, inputSize, srcVideoPath, classifiedVideoPath):
     classIndices = {'in_process': 0, 'stable': 1}
     indexClasses = {0: 'in_process', 1: 'stable'}
     colors = {0: (0, 0, 255), 1: (0, 220, 0)}
 
-    size = (256, 256)
-
-    # weights = '11_0.1113_0.9576_1.0759_0.9231.h5'    # 809-0.81523  810-0.99917 811-0.10084
-    # weights = '03_0.1970_0.9487_0.3971_0.8462.h5'    #   809-0.99674  810-0.99912 811-0.98278
-    # weights = '17_0.0895_0.9823_0.7979_0.9500.h5'
-    weights = '49_0.0614_0.9881_0.0000_1.0000.h5'
-    model = makeModel(size, weights='weights/' + weights)
-
-    cap = cv2.VideoCapture(r'D:\DiskE\Computer_Vision_Task\video_2.mp4')
-    writer = videoWriter(cap, 'videos/video_2_classified_w49.mp4')
+    cap = cv2.VideoCapture(srcVideoPath)
+    writer = videoWriter(cap, classifiedVideoPath)
     # writer = None
 
-    for pos, bgrImg, batch in video_frames(cap, size, startFrom=0):
+    for pos, bgrImg, batch in video_frames(cap, inputSize, startFrom=0):
         class_ = model.predict_classes(batch)[0, 0]
         proba = model.predict(batch)[0, 0]
 
@@ -86,12 +78,30 @@ def main():
 
         if writer: writer.write(bgrImg)
 
+        if pos % 500 == 0:
+            print('Processed: ', pos)
+
         # cv2.imshow('Image', bgrImg)
         # if cv2.waitKey(1) in (27,):
         #     break
 
     cap.release()
     if writer: writer.release()
+
+
+def main():
+    size = (256, 256)
+
+    weights = '4_50_0.1156_0.9848_0.6352_0.9524.h5'
+    model = makeModel(size, weights='weights/' + weights)
+
+    videoMap = [
+        (r'D:\DiskE\Computer_Vision_Task\video_6.mp4', 'classificationLogs/video_6_classified_4_50.csv'),
+        (r'D:\DiskE\Computer_Vision_Task\video_2.mp4', 'classificationLogs/video_2_classified_4_50.csv')
+    ]
+
+    for srcVideoPath, classifiedVideoPath in videoMap:
+        logClassification(model, size, srcVideoPath, classifiedVideoPath)
 
 
 main()
