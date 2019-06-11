@@ -67,11 +67,13 @@ def main():
 
     # weights = '11_0.1113_0.9576_1.0759_0.9231.h5'    # 809-0.81523  810-0.99917 811-0.10084
     # weights = '03_0.1970_0.9487_0.3971_0.8462.h5'    #   809-0.99674  810-0.99912 811-0.98278
-    weights = '17_0.0895_0.9823_0.7979_0.9500.h5'
-    model = makeModel(size, weights=weights)
+    # weights = '17_0.0895_0.9823_0.7979_0.9500.h5'
+    weights = '49_0.0614_0.9881_0.0000_1.0000.h5'
+    model = makeModel(size, weights='weights/' + weights)
 
     cap = cv2.VideoCapture(r'D:\DiskE\Computer_Vision_Task\video_2.mp4')
-    writer = videoWriter(cap, 'video_2_classified.mp4')
+    writer = videoWriter(cap, 'videos/video_2_classified_w49.mp4')
+    # writer = None
 
     for pos, bgrImg, batch in video_frames(cap, size, startFrom=0):
         class_ = model.predict_classes(batch)[0, 0]
@@ -83,10 +85,10 @@ def main():
         cv2.putText(bgrImg, info, (15, 52), cv2.FONT_HERSHEY_COMPLEX, 1, color)
 
         if writer: writer.write(bgrImg)
-        cv2.imshow('Image', bgrImg)
 
-        if cv2.waitKey(1) in (27, ):
-            break
+        # cv2.imshow('Image', bgrImg)
+        # if cv2.waitKey(1) in (27,):
+        #     break
 
     cap.release()
     if writer: writer.release()
