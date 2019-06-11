@@ -3,9 +3,10 @@ from dataset import makeDataset
 import keras
 import os
 
+
 def train():
     inputSize = (256, 256)
-    startWithWeights = '/mnt/HDD/training_checkpoints/KerasCatsVsDogsExperiments/pins_processing/2/01_0.4317_0.9219_0.2505_0.8462.h5'
+    startWithWeights = '/mnt/HDD/training_checkpoints/KerasCatsVsDogsExperiments/pins_processing/2/11_0.1113_0.9576_1.0759_0.9231.h5'
     model = makeModel(inputSize, compileForTraining=True, weights=startWithWeights)
 
     epochs = 50
@@ -24,7 +25,7 @@ def train():
     nb_train_samples = train_generator.samples
     nb_validation_samples = validation_generator.samples
 
-    checkpointDir = '/mnt/HDD/training_checkpoints/KerasCatsVsDogsExperiments/pins_processing/2'
+    checkpointDir = '/mnt/HDD/training_checkpoints/KerasCatsVsDogsExperiments/pins_processing/3'
     os.makedirs(checkpointDir, exist_ok=True)
 
     checkpoint = keras.callbacks.ModelCheckpoint(
@@ -35,13 +36,16 @@ def train():
         # mode='max'
     )
 
+    validation_steps = nb_validation_samples // batch_size
+    if validation_steps < 2:
+        validation_steps = 2
     model.fit_generator(
         train_generator,
         steps_per_epoch=1000,  # nb_train_samples // batch_size,
         epochs=epochs,
         callbacks=[checkpoint],
         validation_data=validation_generator,
-        validation_steps=(nb_validation_samples // batch_size) or 1)
+        validation_steps=validation_steps)
 
 
 if __name__ == '__main__':
