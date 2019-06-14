@@ -29,6 +29,11 @@ def makeModel(inputSize=(150, 150), compileForTraining=False, weights=None):
     model.add(Dropout(0.5))
     model.add(Dense(1))
     model.add(Activation('sigmoid'))
+
+    # bind and set instance method
+    setattr(model, predict_classes_probabilities.__name__,
+            predict_classes_probabilities.__get__(model, model.__class__))
+
     if compileForTraining:
         model.compile(loss='binary_crossentropy',
                       optimizer='rmsprop',
@@ -36,3 +41,24 @@ def makeModel(inputSize=(150, 150), compileForTraining=False, weights=None):
     if weights is not None:
         model.load_weights(weights)
     return model
+
+
+def predict_classes_probabilities(model, x, batch_size=32, verbose=0):
+    """Generate class predictions for the input samples.
+
+    The input samples are processed batch by batch.
+
+    Arguments:
+        x: input data, as a Numpy array or list of Numpy arrays
+            (if the model has multiple inputs).
+        batch_size: integer.
+        verbose: verbosity mode, 0 or 1.
+
+    Returns:
+        A numpy array of class predictions.
+    """
+    proba = model.predict(x, batch_size=batch_size, verbose=verbose)
+    if proba.shape[-1] > 1:
+        return proba.argmax(axis=-1), proba.max(axis=-1)
+    else:
+        return (proba > 0.5).astype('int32'), proba

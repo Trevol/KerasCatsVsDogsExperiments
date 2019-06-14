@@ -1,9 +1,7 @@
-from keras.preprocessing.image import load_img, img_to_array
 from model import makeModel
-import matplotlib.pyplot as plt
 import os
-from PIL import ImageDraw, Image
 import cv2
+import time
 
 
 def toBatch(image, targetSize):
@@ -35,7 +33,6 @@ def video_frames(cap, targetSize, startFrom=None):
             break
         rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         yield pos, frame, toBatch(rgb, targetSize)
-    cap.release()
 
 
 def error_frames_video_2():
@@ -48,6 +45,11 @@ def error_frames_video_2():
         1614,
     ]
 
+    f2 = [
+        2,
+        60
+    ]
+
 
 def videoWriter(videoCapture: cv2.VideoCapture, videoPath):
     cc = cv2.VideoWriter_fourcc(*'XVID')  # 'XVID' ('M', 'J', 'P', 'G')
@@ -58,35 +60,50 @@ def videoWriter(videoCapture: cv2.VideoCapture, videoPath):
     return cv2.VideoWriter(videoPath, cc, videoCapture.get(cv2.CAP_PROP_FPS), size)
 
 
-def classifyVideo(model, inputSize, srcVideoPath, classifiedVideoPath):
-    classIndices = {'in_process': 0, 'stable': 1}
-    indexClasses = {0: 'in_process', 1: 'stable'}
-    colors = {0: (0, 0, 255), 1: (0, 220, 0)}
+class VideoClassificationCsvLogWriter:
+    def __init__(self, logFilePath):
+        self.logFilePath = logFilePath
+        self._file = None
+        self._writesCount = 0
 
+    def write(self, frameNum, label, proba):
+        if self._file is None:
+            self._file = open(self.logFilePath, mode='w')
+
+        if self._writesCount > 0:
+            self._file.write('\n')
+        row = f'{frameNum},{label},{proba}'
+        self._file.write(row)
+        self._writesCount += 1
+
+    def release(self):
+        if self._file:
+            self._file.close()
+            self._file = None
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.release()
+
+
+def logClassification(model, inputSize, srcVideoPath, logFilePath):
     cap = cv2.VideoCapture(srcVideoPath)
-    writer = videoWriter(cap, classifiedVideoPath)
-    # writer = None
+    log = VideoClassificationCsvLogWriter(logFilePath)
+    baseVideoName = os.path.basename(srcVideoPath)
 
+    t0 = time.time()
     for pos, bgrImg, batch in video_frames(cap, inputSize, startFrom=0):
-        class_ = model.predict_classes(batch)[0, 0]
-        proba = model.predict(batch)[0, 0]
+        class_, proba = model.predict_classes_probabilities(batch)
+        class_ = class_[0, 0]
+        proba = proba[0, 0]
+        log.write(pos, class_, proba)
+        if pos > 0 and pos % 500 == 0:
+            print(f'{baseVideoName}. Processed: {pos}. Time elapsed: {time.time() - t0:.1f} s')
 
-        color = colors[class_]
-        cv2.putText(bgrImg, f'{pos}', (15, 22), cv2.FONT_HERSHEY_COMPLEX, 1, color)
-        info = f'{class_} {indexClasses[class_]}  {proba:.5f}'
-        cv2.putText(bgrImg, info, (15, 52), cv2.FONT_HERSHEY_COMPLEX, 1, color)
-
-        if writer: writer.write(bgrImg)
-
-        if pos % 500 == 0:
-            print('Processed: ', pos)
-
-        # cv2.imshow('Image', bgrImg)
-        # if cv2.waitKey(1) in (27,):
-        #     break
-
+    log.release()
     cap.release()
-    if writer: writer.release()
 
 
 def main():

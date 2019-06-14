@@ -1,7 +1,14 @@
-from dataset import makeDataset
+class TestObj:
+    pass
 
-train_gen, val_gen = makeDataset('data', (150, 150), 1)
-# item = next(train_gen)
-# data, labels = item
-print(train_gen.labels)
-print(train_gen.class_indices)
+
+inst = TestObj()
+
+
+def myMethod(self):
+    print('11111', self)
+
+
+inst.mmm = myMethod.__get__(inst, inst.__class__)
+
+inst.mmm()
