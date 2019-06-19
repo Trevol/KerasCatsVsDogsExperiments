@@ -34,13 +34,21 @@ class VideoPlayback:
         self.setPos(newPos)
 
     def frames(self):
-        if not self.cap:
-            raise Exception('VideoCapture already released')
+        assert self.cap
         while True:
-            ret, frame = self.cap.read()
-            if not ret:
+            frame = self.readFrame()
+            if frame is None:
                 break
             yield self.__currentPos() - 1, frame
+
+    def readFrame(self):
+        ret, frame = self.cap.read()
+        if not ret:
+            return None
+        return frame
+
+    def framesCount(self):
+        return int(self.cap.get(cv2.CAP_PROP_FRAME_COUNT))
 
     def handleKey(self):
         key = cv2.waitKeyEx()
