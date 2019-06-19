@@ -16,9 +16,6 @@ def putInfo(frame, framePos, class_, probability):
     cv2.putText(frame, info, (15, 52), cv2.FONT_HERSHEY_COMPLEX, 1, color)
 
 
-# check
-# 402 (req: in_process), [1556-1565] (req: in_process), 1614 (req: in_process)
-# 2547 - in_proc
 def main():
     videoMap = [
         # ('D:/DiskE/Computer_Vision_Task/video_6.mp4', 'classificationLogs/video_6_classified_4_50.csv'),
