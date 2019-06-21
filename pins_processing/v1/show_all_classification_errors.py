@@ -58,6 +58,7 @@ def main():
         video.release()
 
     for videoPath, _, _, misclassifiedFrames in map:
+        print(len(misclassifiedFrames))
         video = VideoPlayback(videoPath)
         for pos, trueClass, computedClass, computedProba in misclassifiedFrames:
             video.setPos(pos)
