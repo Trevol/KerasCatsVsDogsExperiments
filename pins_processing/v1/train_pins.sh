@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-ROOT="$(pwd)/.."
+ROOT="$(pwd)/../.."
 
 # activate venv
 source $ROOT/venv/bin/activate
