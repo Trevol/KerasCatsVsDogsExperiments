@@ -6,10 +6,10 @@ import os
 
 def train():
     inputSize = (256, 256)
-    trainSessionId = 2
+    trainSessionId = 3
     baseCheckpointsDir = '/mnt/HDD/training_checkpoints/KerasCatsVsDogsExperiments/pins_processing_v2'
 
-    startWithWeights = f'{baseCheckpointsDir}/1/1_10_0.2327_0.9831_0.9913_0.9250.h5'
+    startWithWeights = f'{baseCheckpointsDir}/2/2_20_1.9109_0.8782_0.1993_0.9875.h5'
     # startWithWeights = None
 
     model = makeModel(inputSize, compileForTraining=True, weights=startWithWeights)

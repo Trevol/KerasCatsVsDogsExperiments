@@ -31,10 +31,15 @@ def restore():
 def main():
     # fromDir toDir cnt stdDeviation
     dirsConfig = [
-        ('dataset/video_2/clear', 'dataset/train/clear', 40, 11),
-        ('dataset/video_2/busy', 'dataset/train/busy', 40, 11),
-        ('dataset/video_2/clear', 'dataset/validation/clear', 20, 15),
-        ('dataset/video_2/busy', 'dataset/validation/busy', 20, 15)
+        # ('dataset/video_2/clear', 'dataset/train/clear', 40, 11),
+        # ('dataset/video_2/busy', 'dataset/train/busy', 40, 11),
+        # ('dataset/video_2/clear', 'dataset/validation/clear', 20, 15),
+        # ('dataset/video_2/busy', 'dataset/validation/busy', 20, 15),
+
+        ('dataset/video_6/clear', 'dataset/train/clear', 40, 11),
+        ('dataset/video_6/busy', 'dataset/train/busy', 40, 11),
+        ('dataset/video_6/clear', 'dataset/validation/clear', 20, 15),
+        ('dataset/video_6/busy', 'dataset/validation/busy', 20, 15)
     ]
     # TODO: how to choose frames? cluster by SSMI (structured similarity index) or
     # TODO: google "cluster images by similarity"
