@@ -18,8 +18,8 @@ def putInfo(frame, framePos, class_, probability):
 
 def main():
     videoMap = [
-        ('D:/DiskE/Computer_Vision_Task/video_6.mp4', 'classificationLogs/video_6_classified_2_20.csv'),
-        # ('D:/DiskE/Computer_Vision_Task/video_2.mp4', 'classificationLogs/video_2_classified_2_20.csv')
+        ('D:/DiskE/Computer_Vision_Task/video_6.mp4', 'classificationLogs/2_20_video_6_classified.csv'),
+        ('D:/DiskE/Computer_Vision_Task/video_2.mp4', 'classificationLogs/2_20_video_2_classified.csv')
     ]
 
     for videoPath, annotationLog in videoMap:
