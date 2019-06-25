@@ -84,12 +84,13 @@ def logClassification(model, inputSize, srcVideoPath, logFilePath):
 def main():
     size = (256, 256)
 
-    weights = '3_50_0.1055_0.9808_0.1875_0.9667.h5'
+    weights = '4_26_1.1794_0.9155_0.0883_0.9804.h5'
     model = makeModel(size, weights='weights/' + weights)
 
+    epoch = '4_26'
     videoMap = [
-        (r'D:\DiskE\Computer_Vision_Task\video_6.mp4', 'classificationLogs/3_50_video_6_classified.csv'),
-        (r'D:\DiskE\Computer_Vision_Task\video_2.mp4', 'classificationLogs/3_50_video_2_classified.csv')
+        (r'D:\DiskE\Computer_Vision_Task\video_6.mp4', f'classificationLogs/{epoch}_video_6_classified.csv'),
+        # (r'D:\DiskE\Computer_Vision_Task\video_2.mp4', f'classificationLogs/{epoch}_video_2_classified.csv')
     ]
 
     for srcVideoPath, classifiedVideoPath in videoMap:

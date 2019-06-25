@@ -1,3 +1,6 @@
 class KbdKeys:
     L_ARROW = 2424832
+    R_ARROW = 2555904
+    UP_ARROW = 2490368
+    DOWN_ARROW = 2621440
     ESC = 27

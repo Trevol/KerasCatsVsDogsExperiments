@@ -17,9 +17,12 @@ def putInfo(frame, framePos, class_, probability):
 
 
 def main():
+    # 0038_6   0130_6 0252
+    # 0060_2
+    epoch = '4_11'
     videoMap = [
-        ('D:/DiskE/Computer_Vision_Task/video_6.mp4', 'classificationLogs/2_20_video_6_classified.csv'),
-        ('D:/DiskE/Computer_Vision_Task/video_2.mp4', 'classificationLogs/2_20_video_2_classified.csv')
+        ('D:/DiskE/Computer_Vision_Task/video_6.mp4', f'classificationLogs/{epoch}_video_6_classified.csv'),
+        ('D:/DiskE/Computer_Vision_Task/video_2.mp4', f'classificationLogs/{epoch}_video_2_classified.csv')
     ]
 
     for videoPath, annotationLog in videoMap:
