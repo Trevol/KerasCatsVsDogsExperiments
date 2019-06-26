@@ -2,6 +2,7 @@ from utils.TrueLabelsReader import TrueLabelsReader
 from utils.VideoPlayback import VideoPlayback, KbdKeys
 from utils.VideoClassificationCsvLogReader import VideoClassificationCsvLogReader
 import cv2
+import numpy as np
 
 
 class ClassificationMeta:
@@ -65,12 +66,9 @@ def main():
                 break
             elif key == KbdKeys.L_ARROW:
                 i -= 1
-                if i < 0:
-                    i = 0
-            else:
+            elif key == KbdKeys.R_ARROW:
                 i += 1
-                if i >= misclassifiedLen:
-                    i = misclassifiedLen - 1
+            i = np.clip(i, 0, misclassifiedLen - 1)
 
         video.release()
 
