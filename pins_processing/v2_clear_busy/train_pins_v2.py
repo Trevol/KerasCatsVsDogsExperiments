@@ -6,16 +6,16 @@ import os
 
 def train():
     inputSize = (256, 256)
-    trainSessionId = 4
+    trainSessionId = 5
     baseCheckpointsDir = '/mnt/HDD/training_checkpoints/KerasCatsVsDogsExperiments/pins_processing_v2'
 
-    startWithWeights = f'{baseCheckpointsDir}/3/3_30_0.0998_0.9770_0.0377_0.9917.h5'
-    # startWithWeights = None
+    # startWithWeights = f'{baseCheckpointsDir}/3/3_30_0.0998_0.9770_0.0377_0.9917.h5'
+    startWithWeights = None
 
     model = makeModel(inputSize, compileForTraining=True, weights=startWithWeights)
 
     epochs = 50
-    batch_size = 20
+    batch_size = 30
 
     train_augmentations = dict(rescale=1. / 255,
                                shear_range=0.2,
