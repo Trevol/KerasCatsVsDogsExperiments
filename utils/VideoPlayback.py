@@ -41,7 +41,9 @@ class VideoPlayback:
                 break
             yield self.__currentPos() - 1, frame
 
-    def readFrame(self):
+    def readFrame(self, pos=None):
+        if pos is not None:
+            self.setPos(pos)
         ret, frame = self.cap.read()
         if not ret:
             return None

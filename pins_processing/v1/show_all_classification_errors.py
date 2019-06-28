@@ -39,7 +39,7 @@ def main():
         trueLog = TrueLabelsReader(trueClassificationDir, ClassificationMeta)
         for pos in range(video.framesCount()):
             computedClass, computedProba = computedLog.byFramePos(pos)
-            trueClass = trueLog.byFramePos(videoId, pos)
+            trueClass = trueLog.classByFramePos(videoId, pos)
             if computedClass != trueClass:
                 misclassifiedFrames.append([pos, trueClass, computedClass, computedProba])
         video.release()
