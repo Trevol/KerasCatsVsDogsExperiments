@@ -89,7 +89,7 @@ class App_:
 
     @classmethod
     def _moveMisclassifiedFramesToTmpDir(cls, videoId, misclassifiedFrames, trueLog):
-        # TODO: move misclassified frames to [dataset/tmp/{videoId}/busy, dataset/tmp/{videoId}/clear]
+        # move misclassified frames to [dataset/tmp/{videoId}/busy, dataset/tmp/{videoId}/clear]
 
         # raise if misclassified frames contains ones from train directory (!!!model misclassified training frames)
         for pos, trueClass, computedClass, computedProba in misclassifiedFrames:
@@ -98,8 +98,9 @@ class App_:
                 raise Exception(f'train frame {pos:04d}_{videoId} is misclassified!!!')
 
         if len(misclassifiedFrames):
-            os.makedirs(f'dataset/tmp/{videoId}/busy', exist_ok=True)
-            os.makedirs(f'dataset/tmp/{videoId}/clear', exist_ok=True)
+            labelNames = ClassificationMeta.NameToId
+            for name in labelNames:
+                os.makedirs(f'dataset/tmp/{videoId}/{name}', exist_ok=True)
 
         for pos, trueClass, computedClass, computedProba in misclassifiedFrames:
             trueLabelDir = trueLog.dirByFramePos(videoId, pos)
@@ -109,8 +110,8 @@ class App_:
             trueLabelFile = os.path.join(trueLabelDir, jpeg)
             if not os.path.isfile(trueLabelFile):
                 continue
-            raise NotImplementedError('trueLabelName required! Use Meta!!')
-            newLocation = f'dataset/tmp/{videoId}/{trueClass}/{jpeg}'
+            trueClassName = ClassificationMeta.IdToName[trueClass]
+            newLocation = f'dataset/tmp/{videoId}/{trueClassName}/{jpeg}'
             os.rename(trueLabelFile, newLocation)
 
         print('Move!!!!')
