@@ -26,6 +26,68 @@ def putInfo(frame, pos, trueClass, computedClass, computedProba, trueLabelDir):
 
 
 class App_:
+    @staticmethod
+    def calcMisclassifiedFrames(map, trueLog):
+        for videoPath, videoId, classificationLogPath, misclassifiedFrames in map:
+            video = VideoPlayback(videoPath)
+            computedLog = VideoClassificationCsvLogReader(classificationLogPath)
+            lastFramePos = trueLog.lastFramePos(videoId)
+            for pos in range(lastFramePos or video.framesCount()):
+                computedClass, computedProba = computedLog.byFramePos(pos)
+                trueClass = trueLog.classByFramePos(videoId, pos)
+                if computedClass != trueClass:
+                    misclassifiedFrames.append([pos, trueClass, computedClass, computedProba])
+            video.release()
+
+    @classmethod
+    def showMisclassifiedFrames(cls, map, trueLog):
+        for videoPath, videoId, _, misclassifiedFrames in map:
+            misclassifiedLen = len(misclassifiedFrames)
+            print(misclassifiedLen)
+            if misclassifiedLen == 0:
+                continue
+            video = VideoPlayback(videoPath)
+            # TODO: warn if misclassified frames contains ones from train directory (!!!model misclassified training frames)
+            currentIndex = 0
+            while True:
+                pos, trueClass, computedClass, computedProba = misclassifiedFrames[currentIndex]
+                frame = video.readFrame(pos)
+                trueLabelDir = trueLog.dirByFramePos(videoId, pos)
+                putInfo(frame, pos, trueClass, computedClass, computedProba, trueLabelDir)
+                cv2.imshow('Video', frame)
+
+                actionContext = [currentIndex, 0, misclassifiedLen - 1, frame, misclassifiedFrames, trueLog, videoId]
+                key, currentIndex = cls.handleAction(actionContext)
+
+                if key == KbdKeys.ESC:
+                    break
+
+            video.release()
+
+    @classmethod
+    def handleAction(cls, actionContext):
+        currentIndex, minIndex, maxIndex, frame, misclassifiedFrames, trueLog, videoId = actionContext
+        key = cv2.waitKeyEx()
+        if key == KbdKeys.L_ARROW:
+            currentIndex -= 1
+            currentIndex = np.clip(currentIndex, minIndex, maxIndex)
+        elif key == KbdKeys.R_ARROW:
+            currentIndex += 1
+            currentIndex = np.clip(currentIndex, minIndex, maxIndex)
+        elif key == ord('s'):
+            cls._moveMisclassifiedFramesToTmpDir(videoId, misclassifiedFrames, trueLog)
+        elif key == '':
+            # move frame to val
+            pass
+
+        return key, currentIndex
+
+    @classmethod
+    def _moveMisclassifiedFramesToTmpDir(cls, videoId, misclassifiedFrames, trueLog):
+        # TODO: move misclassified frames to [dataset/tmp/{videoId}/busy, dataset/tmp/{videoId}/clear]
+        # TODO: DON'T MOVE from validation directory!!!
+        print('Move!!!!')
+
     def run(self):
         s = '5_12'
         map = [
@@ -34,62 +96,8 @@ class App_:
         ]
         trueLog = TrueLabelsReader('dataset', ClassificationMeta)
 
-        def calcMisclassifiedFrames():
-            for videoPath, videoId, classificationLogPath, misclassifiedFrames in map:
-                video = VideoPlayback(videoPath)
-                computedLog = VideoClassificationCsvLogReader(classificationLogPath)
-                lastFramePos = trueLog.lastFramePos(videoId)
-                for pos in range(lastFramePos or video.framesCount()):
-                    computedClass, computedProba = computedLog.byFramePos(pos)
-                    trueClass = trueLog.classByFramePos(videoId, pos)
-                    if computedClass != trueClass:
-                        misclassifiedFrames.append([pos, trueClass, computedClass, computedProba])
-                video.release()
-
-        def showMisclassifiedFrames():
-            for videoPath, videoId, _, misclassifiedFrames in map:
-                misclassifiedLen = len(misclassifiedFrames)
-                print(misclassifiedLen)
-                if misclassifiedLen == 0:
-                    continue
-                video = VideoPlayback(videoPath)
-
-                currentIndex = 0
-                while True:
-                    pos, trueClass, computedClass, computedProba = misclassifiedFrames[currentIndex]
-                    frame = video.readFrame(pos)
-                    trueLabelDir = trueLog.dirByFramePos(videoId, pos)
-                    putInfo(frame, pos, trueClass, computedClass, computedProba, trueLabelDir)
-                    cv2.imshow('Video', frame)
-
-                    actionContext = [currentIndex, 0, misclassifiedLen - 1, frame]
-                    key, currentIndex = self.handleAction(actionContext)
-
-                    if key == KbdKeys.ESC:
-                        break
-
-                video.release()
-
-        calcMisclassifiedFrames()
-        showMisclassifiedFrames()
-
-    def handleAction(self, context):
-        currentIndex, minIndex, maxIndex, frame = context
-        key = cv2.waitKeyEx()
-        if key == KbdKeys.L_ARROW:
-            currentIndex -= 1
-            currentIndex = np.clip(currentIndex, minIndex, maxIndex)
-        elif key == KbdKeys.R_ARROW:
-            currentIndex += 1
-            currentIndex = np.clip(currentIndex, minIndex, maxIndex)
-        elif key == 'd':
-            # move frame to train
-            pass
-        elif key == '':
-            # move frame to val
-            pass
-
-        return key, currentIndex
+        self.calcMisclassifiedFrames(map, trueLog)
+        self.showMisclassifiedFrames(map, trueLog)
 
 
 if __name__ == '__main__':
