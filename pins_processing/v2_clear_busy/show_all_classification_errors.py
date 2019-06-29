@@ -3,6 +3,8 @@ from utils.VideoPlayback import VideoPlayback, KbdKeys
 from utils.VideoClassificationCsvLogReader import VideoClassificationCsvLogReader
 import cv2
 import numpy as np
+from warnings import warn
+import os
 
 
 class ClassificationMeta:
@@ -47,7 +49,13 @@ class App_:
             if misclassifiedLen == 0:
                 continue
             video = VideoPlayback(videoPath)
-            # TODO: warn if misclassified frames contains ones from train directory (!!!model misclassified training frames)
+
+            # warn if misclassified frames contains ones from train directory (!!!model misclassified training frames)
+            for pos, trueClass, computedClass, computedProba in misclassifiedFrames:
+                trueLabelDir = trueLog.dirByFramePos(videoId, pos)
+                if 'train' in trueLabelDir:
+                    warn(f'train frame {pos:04d}_{videoId} is misclassified!!!')
+
             currentIndex = 0
             while True:
                 pos, trueClass, computedClass, computedProba = misclassifiedFrames[currentIndex]
@@ -76,16 +84,35 @@ class App_:
             currentIndex = np.clip(currentIndex, minIndex, maxIndex)
         elif key == ord('s'):
             cls._moveMisclassifiedFramesToTmpDir(videoId, misclassifiedFrames, trueLog)
-        elif key == '':
-            # move frame to val
-            pass
 
         return key, currentIndex
 
     @classmethod
     def _moveMisclassifiedFramesToTmpDir(cls, videoId, misclassifiedFrames, trueLog):
         # TODO: move misclassified frames to [dataset/tmp/{videoId}/busy, dataset/tmp/{videoId}/clear]
-        # TODO: DON'T MOVE from validation directory!!!
+
+        # raise if misclassified frames contains ones from train directory (!!!model misclassified training frames)
+        for pos, trueClass, computedClass, computedProba in misclassifiedFrames:
+            trueLabelDir = trueLog.dirByFramePos(videoId, pos)
+            if 'train' in trueLabelDir:
+                raise Exception(f'train frame {pos:04d}_{videoId} is misclassified!!!')
+
+        if len(misclassifiedFrames):
+            os.makedirs(f'dataset/tmp/{videoId}/busy', exist_ok=True)
+            os.makedirs(f'dataset/tmp/{videoId}/clear', exist_ok=True)
+
+        for pos, trueClass, computedClass, computedProba in misclassifiedFrames:
+            trueLabelDir = trueLog.dirByFramePos(videoId, pos)
+            if 'validation' in trueLabelDir:  # DON'T MOVE from validation directory!!!
+                continue
+            jpeg = f'{pos:04d}_{videoId}.jpg'
+            trueLabelFile = os.path.join(trueLabelDir, jpeg)
+            if not os.path.isfile(trueLabelFile):
+                continue
+            raise NotImplementedError('trueLabelName required! Use Meta!!')
+            newLocation = f'dataset/tmp/{videoId}/{trueClass}/{jpeg}'
+            os.rename(trueLabelFile, newLocation)
+
         print('Move!!!!')
 
     def run(self):
