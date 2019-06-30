@@ -74,8 +74,10 @@ def logClassification(model, inputSize, srcVideoPath, logFilePath):
         class_ = class_[0, 0]
         proba = proba[0, 0]
         log.write(pos, class_, proba)
-        if pos > 0 and pos % 500 == 0:
+        if pos > 0 and pos % 1000 == 0:
             print(f'{baseVideoName}. Processed: {pos}. Time elapsed: {time.time() - t0:.1f} s')
+
+    print(f'{baseVideoName}. Processed: {pos}. Time elapsed: {time.time() - t0:.1f} s')
 
     log.release()
     cap.release()
