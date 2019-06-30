@@ -45,9 +45,16 @@ class App_:
     def showMisclassifiedFrames(cls, map, trueLog):
         for videoPath, videoId, _, misclassifiedFrames in map:
             misclassifiedLen = len(misclassifiedFrames)
-            print(misclassifiedLen)
+
+            from itertools import groupby
+            statsByTrueLabel = [ (k, len(v)) for k, v in groupby(misclassifiedLen, key=lambda i: i[1])]
+            print(misclassifiedLen, statsByTrueLabel)
+
+            return
+
             if misclassifiedLen == 0:
                 continue
+
             video = VideoPlayback(videoPath)
 
             # warn if misclassified frames contains ones from train directory (!!!model misclassified training frames)
@@ -82,7 +89,7 @@ class App_:
         elif key == KbdKeys.R_ARROW:
             currentIndex += 1
             currentIndex = np.clip(currentIndex, minIndex, maxIndex)
-        elif key == ord('s'):
+        elif key == ord('S'):
             cls._moveMisclassifiedFramesToTmpDir(videoId, misclassifiedFrames, trueLog)
 
         return key, currentIndex
@@ -97,10 +104,12 @@ class App_:
             if 'train' in trueLabelDir:
                 raise Exception(f'train frame {pos:04d}_{videoId} is misclassified!!!')
 
+        tmpMisclassifiedDir = 'dataset/tmpMisclassified'
+
         if len(misclassifiedFrames):
             labelNames = ClassificationMeta.NameToId
             for name in labelNames:
-                os.makedirs(f'dataset/tmp/{videoId}/{name}', exist_ok=True)
+                os.makedirs(f'{tmpMisclassifiedDir}/{videoId}/{name}', exist_ok=True)
 
         for pos, trueClass, computedClass, computedProba in misclassifiedFrames:
             trueLabelDir = trueLog.dirByFramePos(videoId, pos)
@@ -111,13 +120,13 @@ class App_:
             if not os.path.isfile(trueLabelFile):
                 continue
             trueClassName = ClassificationMeta.IdToName[trueClass]
-            newLocation = f'dataset/tmp/{videoId}/{trueClassName}/{jpeg}'
+            newLocation = f'{tmpMisclassifiedDir}/{videoId}/{trueClassName}/{jpeg}'
             os.rename(trueLabelFile, newLocation)
 
         print('Move!!!!')
 
     def run(self):
-        s = '5_12'
+        s = '7_16'
         map = [
             # ('D:/DiskE/Computer_Vision_Task/video_6.mp4', 6, f'classificationLogs/{s}_video_6_classified.csv', []),
             ('D:/DiskE/Computer_Vision_Task/video_2.mp4', 2, f'classificationLogs/{s}_video_2_classified.csv', [])
@@ -129,4 +138,13 @@ class App_:
 
 
 if __name__ == '__main__':
-    App_().run()
+    mmm = [
+        (1, 'busy'),
+        (1, 'busy'),
+        (2, 'clear'),
+        (2, 'clear'),
+        (3, 'clear')
+    ]
+    from itertools import groupby
+    groupby(mmm, key=lambda i: i[1])
+    # App_().run()

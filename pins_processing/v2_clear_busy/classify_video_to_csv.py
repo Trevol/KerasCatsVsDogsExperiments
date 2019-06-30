@@ -81,16 +81,27 @@ def logClassification(model, inputSize, srcVideoPath, logFilePath):
     cap.release()
 
 
+def lastWeights(weightsDir):
+    weightsFiles = [file for file in os.listdir(weightsDir) if os.path.splitext(file)[-1] == '.h5']
+    if len(weightsFiles) == 0:
+        return None, None
+    lastFile = sorted(weightsFiles)[-1]
+    parts = lastFile.split('_')
+    epoch = f'{parts[0]}_{parts[1]}'
+    return epoch, os.path.join(weightsDir, lastFile)
+
+
 def main():
     size = (256, 256)
 
-    weights = '5_12_0.1031_0.9860_2.1979_0.8636.h5'
-    model = makeModel(size, weights='weights/' + weights)
+    epoch, weights = lastWeights('weights')
+    model = makeModel(size, weights=weights)
 
-    epoch = '5_12'
+    print(f'Classifying epoch {epoch}. Weights: {weights}')
+
     videoMap = [
-        (r'D:\DiskE\Computer_Vision_Task\video_6.mp4', f'classificationLogs/{epoch}_video_6_classified.csv'),
-        (r'D:\DiskE\Computer_Vision_Task\video_2.mp4', f'classificationLogs/{epoch}_video_2_classified.csv')
+        (r'D:\DiskE\Computer_Vision_Task\video_2.mp4', f'classificationLogs/{epoch}_video_2_classified.csv'),
+        # (r'D:\DiskE\Computer_Vision_Task\video_6.mp4', f'classificationLogs/{epoch}_video_6_classified.csv')
     ]
 
     for srcVideoPath, classifiedVideoPath in videoMap:
