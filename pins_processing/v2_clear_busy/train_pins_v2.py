@@ -47,7 +47,7 @@ def train():
         validation_steps = 2
     model.fit_generator(
         train_generator,
-        steps_per_epoch=(nb_train_samples // batch_size + 1)*2,
+        steps_per_epoch=(nb_train_samples + 1) * 2,  # (nb_train_samples // batch_size + 1)*2,
         epochs=epochs,
         callbacks=[checkpoint],
         validation_data=validation_generator,
