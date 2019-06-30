@@ -132,7 +132,7 @@ class App_:
         print('Move!!!!')
 
     def run(self):
-        s = '7_16'
+        s = '8_50'
         map = [
             # ('D:/DiskE/Computer_Vision_Task/video_6.mp4', 6, f'classificationLogs/{s}_video_6_classified.csv', []),
             ('D:/DiskE/Computer_Vision_Task/video_2.mp4', 2, f'classificationLogs/{s}_video_2_classified.csv', [])
