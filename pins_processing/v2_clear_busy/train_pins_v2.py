@@ -15,7 +15,7 @@ def train():
     model = makeModel(inputSize, compileForTraining=True, weights=startWithWeights)
 
     epochs = 50
-    batch_size = 30
+    batch_size = 40
 
     train_augmentations = dict(rescale=1. / 255,
                                shear_range=0.2,
