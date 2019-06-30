@@ -5,6 +5,7 @@ import cv2
 import numpy as np
 from warnings import warn
 import os
+from itertools import groupby
 
 
 class ClassificationMeta:
@@ -41,16 +42,21 @@ class App_:
                     misclassifiedFrames.append([pos, trueClass, computedClass, computedProba])
             video.release()
 
+    @staticmethod
+    def __stats(misclassifiedFrames):
+        def trueLabelAccessor(item):
+            return item[1]
+
+        statsByTrueLabel = {ClassificationMeta.IdToName[k]: len(list(v)) for k, v in
+                            groupby(sorted(misclassifiedFrames, key=trueLabelAccessor), key=trueLabelAccessor)}
+        return statsByTrueLabel
+
     @classmethod
     def showMisclassifiedFrames(cls, map, trueLog):
         for videoPath, videoId, _, misclassifiedFrames in map:
             misclassifiedLen = len(misclassifiedFrames)
 
-            from itertools import groupby
-            statsByTrueLabel = [ (k, len(v)) for k, v in groupby(misclassifiedLen, key=lambda i: i[1])]
-            print(misclassifiedLen, statsByTrueLabel)
-
-            return
+            print(misclassifiedLen, cls.__stats(misclassifiedFrames))
 
             if misclassifiedLen == 0:
                 continue
@@ -138,13 +144,4 @@ class App_:
 
 
 if __name__ == '__main__':
-    mmm = [
-        (1, 'busy'),
-        (1, 'busy'),
-        (2, 'clear'),
-        (2, 'clear'),
-        (3, 'clear')
-    ]
-    from itertools import groupby
-    groupby(mmm, key=lambda i: i[1])
-    # App_().run()
+    App_().run()
