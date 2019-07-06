@@ -132,7 +132,7 @@ class App_:
         print('Move!!!!')
 
     def run(self):
-        epoch = '9_35'
+        epoch = '10_08'
         print(f'Epoch {epoch}')
         map = [
             # ('D:/DiskE/Computer_Vision_Task/video_6.mp4', 6, f'classificationLogs/{epoch}_video_6_classified.csv', []),

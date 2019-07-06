@@ -87,7 +87,13 @@ def lastWeights(weightsDir):
     weightsFiles = [file for file in os.listdir(weightsDir) if os.path.splitext(file)[-1] == '.h5']
     if len(weightsFiles) == 0:
         return None, None
-    lastFile = sorted(weightsFiles)[-1]
+
+    def epochFn(file):
+        p = file.split('_')
+        return (int(p[0]), int(p[1]))
+
+    lastFile = sorted(weightsFiles, key=epochFn)[-1]
+
     parts = lastFile.split('_')
     epoch = f'{parts[0]}_{parts[1]}'
     return epoch, os.path.join(weightsDir, lastFile)
@@ -97,9 +103,9 @@ def main():
     size = (256, 256)
 
     epoch, weights = lastWeights('weights')
-    model = makeModel(size, weights=weights)
-
     print(f'Classifying epoch {epoch}. Weights: {weights}')
+
+    model = makeModel(size, weights=weights)
 
     videoMap = [
         (r'D:\DiskE\Computer_Vision_Task\video_2.mp4', f'classificationLogs/{epoch}_video_2_classified.csv'),
