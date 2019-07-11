@@ -6,10 +6,10 @@ import os
 
 def train():
     inputSize = (256, 256)
-    trainSessionId = 10
-    baseCheckpointsDir = '/mnt/HDD/training_checkpoints/KerasCatsVsDogsExperiments/pins_processing_v2'
+    trainSessionId = 2
+    baseCheckpointsDir = '/HDD_DATA/training_checkpoints/KerasCatsVsDogsExperiments/pins_processing_v2'
 
-    startWithWeights = f'{baseCheckpointsDir}/9/9_50_0.1281_0.9823_1.3102_0.8378.h5'
+    startWithWeights = f'{baseCheckpointsDir}/1/1_35_0.1801_0.9464_1.1394_0.8649.h5'
     # startWithWeights = None
 
     model = makeModel(inputSize, compileForTraining=True, weights=startWithWeights)
@@ -33,7 +33,7 @@ def train():
     checkpointDir = f'{baseCheckpointsDir}/{trainSessionId}'
     os.makedirs(checkpointDir, exist_ok=True)
 
-    checkpointNameTemplate = str(trainSessionId) + '_{epoch:02d}_{loss:.4f}_{acc:.4f}_{val_loss:.4f}_{val_acc:.4f}.h5'
+    checkpointNameTemplate = f'{trainSessionId}_{{epoch:02d}}_{{loss:.4f}}_{{acc:.4f}}_{{val_loss:.4f}}_{{val_acc:.4f}}.h5'
     checkpoint = keras.callbacks.ModelCheckpoint(
         os.path.join(checkpointDir, checkpointNameTemplate),
         verbose=1,

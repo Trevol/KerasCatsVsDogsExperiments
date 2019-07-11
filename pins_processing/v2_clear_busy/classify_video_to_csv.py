@@ -102,7 +102,8 @@ def lastWeights(weightsDir):
 def main():
     size = (256, 256)
 
-    epoch, weights = lastWeights('weights')
+    weightsDir = '/home/trevol/HDD_DATA/training_checkpoints/KerasCatsVsDogsExperiments/pins_processing_v2/2'
+    epoch, weights = lastWeights(weightsDir)
     print(f'Classifying epoch {epoch}. Weights: {weights}')
 
     model = makeModel(size, weights=weights)
