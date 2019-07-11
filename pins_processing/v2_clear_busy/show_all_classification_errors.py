@@ -132,11 +132,11 @@ class App_:
         print('Move!!!!')
 
     def run(self):
-        epoch = '10_08'
+        epoch = '2_01'
         print(f'Epoch {epoch}')
         map = [
-            # ('D:/DiskE/Computer_Vision_Task/video_6.mp4', 6, f'classificationLogs/{epoch}_video_6_classified.csv', []),
-            ('D:/DiskE/Computer_Vision_Task/video_2.mp4', 2, f'classificationLogs/{epoch}_video_2_classified.csv', [])
+            # ('D:/DiskE/Computer_Vision_Task/Video_6.mp4', 6, f'classificationLogs/{epoch}_video_6_classified.csv', []),
+            ('/HDD_DATA/Computer_Vision_Task/Video_2.mp4', 2, f'classificationLogs/{epoch}_video_2_classified.csv', [])
         ]
         trueLog = TrueLabelsReader('dataset', ClassificationMeta)
 

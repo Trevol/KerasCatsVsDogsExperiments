@@ -102,14 +102,14 @@ def lastWeights(weightsDir):
 def main():
     size = (256, 256)
 
-    weightsDir = '/home/trevol/HDD_DATA/training_checkpoints/KerasCatsVsDogsExperiments/pins_processing_v2/2'
+    weightsDir = '/HDD_DATA/training_checkpoints/KerasCatsVsDogsExperiments/pins_processing_v2/2'
     epoch, weights = lastWeights(weightsDir)
     print(f'Classifying epoch {epoch}. Weights: {weights}')
 
     model = makeModel(size, weights=weights)
 
     videoMap = [
-        (r'D:\DiskE\Computer_Vision_Task\video_2.mp4', f'classificationLogs/{epoch}_video_2_classified.csv'),
+        ('/HDD_DATA/Computer_Vision_Task/Video_2.mp4', f'classificationLogs/{epoch}_video_2_classified.csv'),
         # (r'D:\DiskE\Computer_Vision_Task\video_6.mp4', f'classificationLogs/{epoch}_video_6_classified.csv')
     ]
 
