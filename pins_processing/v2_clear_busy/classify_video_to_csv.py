@@ -1,38 +1,61 @@
+import numpy as np
 from model import makeModel
 import os
 import cv2
 import time
 
 
-def toBatch(image, targetSize):
-    x = cv2.resize(image, targetSize, interpolation=cv2.INTER_NEAREST) / 255.
-    return x.reshape((1,) + x.shape)
+class FramesBatcher:
+    def __init__(self, videoCapture, batchSize, targetImgSize):
+        assert batchSize > 0
+        self.videoCapture = videoCapture
+        self.batchSize = batchSize
+        self.targetImgSize = targetImgSize
+
+    @staticmethod
+    def _getFramePos(videoCapture):
+        return int(videoCapture.get(cv2.CAP_PROP_POS_FRAMES))
+
+    @staticmethod
+    def batch(frames, targetSize):
+        if len(frames) == 0:
+            return None
+        preparedFrames = []
+        for frame in frames:
+            frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+            frame = cv2.resize(frame, targetSize, interpolation=cv2.INTER_NEAREST) / 255.
+            preparedFrames.append(frame)
+        return np.stack(preparedFrames)
+
+    def nextBatch(self):
+        # accumulate batches
+        frames = []
+        framePositions = []
+
+        for _ in range(self.batchSize):
+            pos = self._getFramePos(self.videoCapture)
+            ret, frame = self.videoCapture.read()
+            if not ret:
+                break
+            framePositions.append(pos)
+            frames.append(frame)
+
+        batch = self.batch(frames, self.targetImgSize)
+        return framePositions, frames, batch
+
+    def batches(self):
+        while True:
+            framePositions, frames, batch = self.nextBatch()
+            if len(framePositions) == 0:
+                break
+            yield framePositions, frames, batch
 
 
-# def static_files(targetSize):
-#     dir = r'D:\DiskE\Computer_Vision_Task\frames_2'
-#     files = [
-#         'f2_0456_30400.00_30.40.jpg',
-#         'f2_0751_50066.67_50.07.jpg'
-#     ]
-#     for file in files:
-#         path = os.path.join(dir, file)
-#         bgr = cv2.imread(path)
-#         rgb = cv2.cvtColor(bgr, cv2.COLOR_BGR2RGB)
-#         batch = toBatch(rgb, targetSize)
-#         yield bgr, batch
-
-
-def video_frames(cap, targetSize, startFrom=None):
+def video_frames_batched(videoCapture, targetSize, batchSize, startFrom=None):
     if startFrom:
-        cap.set(cv2.CAP_PROP_POS_FRAMES, startFrom)
-    while True:
-        pos = int(cap.get(cv2.CAP_PROP_POS_FRAMES))
-        ret, frame = cap.read()
-        if not ret:
-            break
-        rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        yield pos, frame, toBatch(rgb, targetSize)
+        videoCapture.set(cv2.CAP_PROP_POS_FRAMES, startFrom)
+    batcher = FramesBatcher(videoCapture, batchSize, targetSize)
+    return batcher.batches()
 
 
 class VideoClassificationCsvLogWriter:
@@ -63,19 +86,20 @@ class VideoClassificationCsvLogWriter:
         self.release()
 
 
-def logClassification(model, inputSize, srcVideoPath, logFilePath):
+def classifyAndLog(model, inputSize, srcVideoPath, logFilePath, batchSize):
     cap = cv2.VideoCapture(srcVideoPath)
     log = VideoClassificationCsvLogWriter(logFilePath)
     baseVideoName = os.path.basename(srcVideoPath)
 
+    pos = -1
     t0 = time.time()
-    for pos, bgrImg, batch in video_frames(cap, inputSize, startFrom=0):
-        class_, proba = model.predict_classes_probabilities(batch)
-        class_ = class_[0, 0]
-        proba = proba[0, 0]
-        log.write(pos, class_, proba)
-        if pos > 0 and pos % 1000 == 0:
-            print(f'{baseVideoName}. Processed: {pos}. Time elapsed: {time.time() - t0:.1f} s')
+    for framePositions, frames, batch in video_frames_batched(cap, inputSize, batchSize, startFrom=0):
+        classes, probabilities = model.predict_classes_probabilities(batch, batchSize)
+
+        for pos, (class_,), (proba,) in zip(framePositions, classes, probabilities):
+            log.write(pos, class_, proba)
+            if pos > 0 and pos % 1000 == 0:
+                print(f'{baseVideoName}. Processed: {pos}. Time elapsed: {time.time() - t0:.1f} s')
 
     print(f'{baseVideoName}. Processed: {pos}. Time elapsed: {time.time() - t0:.1f} s')
 
@@ -110,11 +134,12 @@ def main():
 
     videoMap = [
         ('/HDD_DATA/Computer_Vision_Task/Video_2.mp4', f'classificationLogs/{epoch}_video_2_classified.csv'),
-        # (r'D:\DiskE\Computer_Vision_Task\video_6.mp4', f'classificationLogs/{epoch}_video_6_classified.csv')
+        ('/HDD_DATA/Computer_Vision_Task/Video_6.mp4', f'classificationLogs/{epoch}_video_6_classified.csv')
     ]
 
+    framesBatchSize = 64
     for srcVideoPath, classifiedVideoPath in videoMap:
-        logClassification(model, size, srcVideoPath, classifiedVideoPath)
+        classifyAndLog(model, size, srcVideoPath, classifiedVideoPath, framesBatchSize)
 
 
 main()
